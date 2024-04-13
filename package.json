@@ -1,16 +1,43 @@
 {
   "name": "sum_ccc_test",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.8",
+  "description": "A library that helps you calculate the sum of 2 random numbers",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository":{
-  	"type":"git",
-  	"url": "git+https://github.com/chichimeo/sum_ccc_test"
+  "dependencies": {
+    "are-arrays": "^1.0.0",
+    "are-objects": "^1.0.0",
+    "sum_ccc_test": "^1.1.5",
+    "alertify.js": "^1.0.12",
+    "axios": "^0.21.1",
+    "bootstrap": "^3.4.1",
+    "core-js": "^2.6.5"
   },
-  "keywords": ["sum", "add", "tong", "cong"],
-  "author": "",
+  "devDependencies": {
+    "@babel/core": "7.21.4",
+    "@babel/preset-env": "7.21.4",
+    "@babel/preset-typescript": "7.21.4",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/git": "10.0.1",
+    "@types/jest": "29.5.0",
+    "@typescript-eslint/eslint-plugin": "5.57.0",
+    "@typescript-eslint/parser": "5.57.0",
+    "babel-jest": "29.5.0",
+    "eslint": "8.37.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chichimeo/sum_ccc_test"
+  },
+  "homepage": "https://github.com/chichimeo/sum_ccc_test",
+  "keywords": [
+    "sum",
+    "add",
+    "tong",
+    "cong"
+  ],
+  "author": "chichimeo",
   "license": "ISC"
 }
