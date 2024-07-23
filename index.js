@@ -69,3 +69,45 @@ function addBigNumbers(a, b) {    let result = "";
     return result;
 }
 exports.addBigNumbers = addBigNumbers;
+
+/**
+ * Subtracts two big numbers represented as strings.
+ * @param {string} a - The first big number.
+ * @param {string} b - The second big number.
+ * @returns {string} - The difference between the two big numbers.
+ */
+function subBigNumbers(a, b) {
+    if (a === b) return "0";
+    let negative = false;
+    if (a.length < b.length || (a.length === b.length && a < b)) {
+        [a, b] = [b, a];
+        negative = true;
+    }
+    a = a.split('').reverse();
+    b = b.split('').reverse();
+
+    let result = [];
+    let borrow = 0;
+
+    for (let i = 0; i < a.length; i++) {
+        let digitA = parseInt(a[i], 10);
+        let digitB = i < b.length ? parseInt(b[i], 10) : 0;
+        let sub = digitA - digitB - borrow;
+        if (sub < 0) {
+            sub += 10;
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+        result.push(sub);
+    }
+
+    while (result[result.length - 1] === 0) {
+        result.pop();
+    }
+
+    let finalResult = result.reverse().join('');
+    return negative ? '-' + finalResult : finalResult;
+}
+
+exports.subBigNumbers = subBigNumbers;
