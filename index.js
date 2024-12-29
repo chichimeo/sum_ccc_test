@@ -111,3 +111,53 @@ function subBigNumbers(a, b) {
 }
 
 exports.subBigNumbers = subBigNumbers;
+
+/**
+ * Divides two big numbers represented as strings.
+ * @param {string} a - The dividend (large number as a string).
+ * @param {string} b - The divisor (large number as a string).
+ * @returns {string} - The quotient of the division.
+ * @throws {Error} - If the divisor is "0".
+ */
+function divBigNumbers(a, b) {
+  if (b === "0") throw new Error("Division by zero is not allowed.");
+  if (a === "0") return "0";
+
+  let negative = false;
+
+  // Handle negative numbers
+  if (a[0] === '-') {
+    negative = !negative;
+    a = a.slice(1);
+  }
+  if (b[0] === '-') {
+    negative = !negative;
+    b = b.slice(1);
+  }
+
+  // Compare magnitude of numbers
+  if (a.length < b.length || (a.length === b.length && a < b)) {
+    return "0";
+  }
+
+  let quotient = "";
+  let remainder = "";
+
+  for (let i = 0; i < a.length; i++) {
+    remainder += a[i];
+    let currentQuotient = 0;
+
+    while (compareBigNumbers(remainder, b) >= 0) {
+      remainder = subBigNumbers(remainder, b);
+      currentQuotient++;
+    }
+
+    quotient += currentQuotient;
+  }
+
+  // Remove leading zeros
+  quotient = quotient.replace(/^0+/, "");
+
+  return (negative ? "-" : "") + quotient;
+}
+exports.divBigNumbers = divBigNumbers;
