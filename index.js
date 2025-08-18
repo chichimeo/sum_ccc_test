@@ -1,6 +1,10 @@
 const areObjects = require('are-objects');
 const areArrays = require('are-arrays');
 
+// =============================================================================
+// BASIC ARITHMETIC OPERATIONS
+// =============================================================================
+
 /**
  * Adds two numbers.
  * @param {number} a - The first number.
@@ -10,7 +14,6 @@ const areArrays = require('are-arrays');
 function sum(a, b) {
     return a + b;
 }
-exports.sum = sum;
 
 /**
  * Subtracts two numbers.
@@ -21,7 +24,6 @@ exports.sum = sum;
 function sub(a, b) {
     return a - b;
 }
-exports.sub = sub;
 
 /**
  * Multiplies two numbers.
@@ -32,7 +34,6 @@ exports.sub = sub;
 function mul(a, b) {
     return a * b;
 }
-exports.mul = mul;
 
 /**
  * Divides two numbers.
@@ -43,7 +44,10 @@ exports.mul = mul;
 function div(a, b) {
     return a / b;
 }
-exports.div = div;
+
+// =============================================================================
+// BIG NUMBER ARITHMETIC OPERATIONS
+// =============================================================================
 
 /**
  * Adds two big numbers represented as strings.
@@ -51,16 +55,17 @@ exports.div = div;
  * @param {string} b - The second big number.
  * @returns {string} - The sum of the two big numbers.
  */
-function addBigNumbers(a, b) {    
-    let result = "";
+function addBigNumbers(a, b) {
+    let result = '';
     let carry = 0;
     let i = a.length - 1;
     let j = b.length - 1;
 
     while (i >= 0 || j >= 0 || carry > 0) {
-        let digitA = i >= 0 ? parseInt(a[i]) : 0;
-        let digitB = j >= 0 ? parseInt(b[j]) : 0;
-        let sum = digitA + digitB + carry;
+        const digitA = i >= 0 ? parseInt(a[i], 10) : 0;
+        const digitB = j >= 0 ? parseInt(b[j], 10) : 0;
+        const sum = digitA + digitB + carry;
+        
         result = (sum % 10) + result;
         carry = Math.floor(sum / 10);
         i--;
@@ -69,7 +74,6 @@ function addBigNumbers(a, b) {
 
     return result;
 }
-exports.addBigNumbers = addBigNumbers;
 
 /**
  * Subtracts two big numbers represented as strings.
@@ -78,72 +82,42 @@ exports.addBigNumbers = addBigNumbers;
  * @returns {string} - The difference between the two big numbers.
  */
 function subBigNumbers(a, b) {
-    if (a === b) return "0";
+    if (a === b) return '0';
+    
     let negative = false;
     if (a.length < b.length || (a.length === b.length && a < b)) {
         [a, b] = [b, a];
         negative = true;
     }
-    a = a.split('').reverse();
-    b = b.split('').reverse();
-
-    let result = [];
+    
+    const digitArrayA = a.split('').reverse();
+    const digitArrayB = b.split('').reverse();
+    const result = [];
     let borrow = 0;
 
-    for (let i = 0; i < a.length; i++) {
-        let digitA = parseInt(a[i], 10);
-        let digitB = i < b.length ? parseInt(b[i], 10) : 0;
-        let sub = digitA - digitB - borrow;
-        if (sub < 0) {
-            sub += 10;
+    for (let i = 0; i < digitArrayA.length; i++) {
+        const digitA = parseInt(digitArrayA[i], 10);
+        const digitB = i < digitArrayB.length ? parseInt(digitArrayB[i], 10) : 0;
+        let difference = digitA - digitB - borrow;
+        
+        if (difference < 0) {
+            difference += 10;
             borrow = 1;
         } else {
             borrow = 0;
         }
-        result.push(sub);
+        
+        result.push(difference);
     }
 
+    // Remove leading zeros
     while (result[result.length - 1] === 0 && result.length > 1) {
         result.pop();
     }
 
-    let finalResult = result.reverse().join('');
+    const finalResult = result.reverse().join('');
     return negative ? '-' + finalResult : finalResult;
 }
-exports.subBigNumbers = subBigNumbers;
-
-/**
- * Compares two big numbers represented as strings.
- * @param {string} a - The first big number.
- * @param {string} b - The second big number.
- * @returns {number} - Returns 1 if a > b, -1 if a < b, and 0 if a === b.
- */
-function compareBigNumbers(a, b) {
-    // Handle negative numbers
-    if (a[0] === '-' && b[0] !== '-') return -1;
-    if (a[0] !== '-' && b[0] === '-') return 1;
-    
-    // Both negative or both positive
-    const bothNegative = a[0] === '-' && b[0] === '-';
-    
-    // Remove negative signs if present
-    if (a[0] === '-') a = a.slice(1);
-    if (b[0] === '-') b = b.slice(1);
-    
-    // Compare lengths first
-    if (a.length > b.length) return bothNegative ? -1 : 1;
-    if (a.length < b.length) return bothNegative ? 1 : -1;
-    
-    // Same length, compare digit by digit
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] > b[i]) return bothNegative ? -1 : 1;
-        if (a[i] < b[i]) return bothNegative ? 1 : -1;
-    }
-    
-    // Equal
-    return 0;
-}
-exports.compareBigNumbers = compareBigNumbers;
 
 /**
  * Multiplies two big numbers represented as strings.
@@ -152,10 +126,11 @@ exports.compareBigNumbers = compareBigNumbers;
  * @returns {string} - The product of the two big numbers.
  */
 function mulBigNumbers(a, b) {
-    if (a === "0" || b === "0") return "0";
+    if (a === '0' || b === '0') return '0';
+    
+    let negative = false;
     
     // Handle negative numbers
-    let negative = false;
     if (a[0] === '-') {
         negative = !negative;
         a = a.slice(1);
@@ -165,13 +140,12 @@ function mulBigNumbers(a, b) {
         b = b.slice(1);
     }
     
-    // Initialize result array with zeros
     const result = new Array(a.length + b.length).fill(0);
     
     // Perform multiplication digit by digit
     for (let i = a.length - 1; i >= 0; i--) {
         for (let j = b.length - 1; j >= 0; j--) {
-            const product = parseInt(a[i]) * parseInt(b[j]);
+            const product = parseInt(a[i], 10) * parseInt(b[j], 10);
             const position = i + j + 1;
             const sum = result[position] + product;
             
@@ -185,20 +159,19 @@ function mulBigNumbers(a, b) {
         result.shift();
     }
     
-    return (negative ? "-" : "") + result.join('');
+    return (negative ? '-' : '') + result.join('');
 }
-exports.mulBigNumbers = mulBigNumbers;
 
 /**
  * Divides two big numbers represented as strings.
- * @param {string} a - The dividend (large number as a string).
- * @param {string} b - The divisor (large number as a string).
+ * @param {string} a - The dividend.
+ * @param {string} b - The divisor.
  * @returns {string} - The quotient of the division.
  * @throws {Error} - If the divisor is "0".
  */
 function divBigNumbers(a, b) {
-    if (b === "0") throw new Error("Division by zero is not allowed.");
-    if (a === "0") return "0";
+    if (b === '0') throw new Error('Division by zero is not allowed.');
+    if (a === '0') return '0';
 
     let negative = false;
 
@@ -212,13 +185,13 @@ function divBigNumbers(a, b) {
         b = b.slice(1);
     }
 
-    // Compare magnitude of numbers
+    // Quick comparison check
     if (a.length < b.length || (a.length === b.length && a < b)) {
-        return "0";
+        return '0';
     }
 
-    let quotient = "";
-    let remainder = "";
+    let quotient = '';
+    let remainder = '';
 
     for (let i = 0; i < a.length; i++) {
         remainder += a[i];
@@ -233,11 +206,10 @@ function divBigNumbers(a, b) {
     }
 
     // Remove leading zeros
-    quotient = quotient.replace(/^0+/, "") || "0";
+    quotient = quotient.replace(/^0+/, '') || '0';
 
-    return (negative ? "-" : "") + quotient;
+    return (negative ? '-' : '') + quotient;
 }
-exports.divBigNumbers = divBigNumbers;
 
 /**
  * Calculates the modulus of two big numbers represented as strings.
@@ -247,68 +219,129 @@ exports.divBigNumbers = divBigNumbers;
  * @throws {Error} - If the divisor is "0".
  */
 function modBigNumbers(a, b) {
-    if (b === "0") throw new Error("Modulus by zero is not allowed.");
-    if (a === "0") return "0";
+    if (b === '0') throw new Error('Modulus by zero is not allowed.');
+    if (a === '0') return '0';
     
-    // Handle negative dividend
     let isNegative = false;
     if (a[0] === '-') {
         isNegative = true;
         a = a.slice(1);
     }
     
-    // Handle negative divisor
     if (b[0] === '-') {
         b = b.slice(1);
     }
     
-    // Simple case: a < b
     if (compareBigNumbers(a, b) < 0) {
-        return isNegative ? "-" + a : a;
+        return isNegative ? '-' + a : a;
     }
     
-    let remainder = "";
+    let remainder = '';
     
     for (let i = 0; i < a.length; i++) {
         remainder += a[i];
-        
-        // Remove leading zeros
-        remainder = remainder.replace(/^0+/, "") || "0";
+        remainder = remainder.replace(/^0+/, '') || '0';
         
         while (compareBigNumbers(remainder, b) >= 0) {
             remainder = subBigNumbers(remainder, b);
         }
     }
     
-    // Apply sign to the result
-    return isNegative && remainder !== "0" ? "-" + remainder : remainder;
+    return isNegative && remainder !== '0' ? '-' + remainder : remainder;
 }
-exports.modBigNumbers = modBigNumbers;
+
+// =============================================================================
+// COMPARISON AND UTILITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Compares two big numbers represented as strings.
+ * @param {string} a - The first big number.
+ * @param {string} b - The second big number.
+ * @returns {number} - Returns 1 if a > b, -1 if a < b, and 0 if a === b.
+ */
+function compareBigNumbers(a, b) {
+    // Handle negative numbers
+    if (a[0] === '-' && b[0] !== '-') return -1;
+    if (a[0] !== '-' && b[0] === '-') return 1;
+    
+    const bothNegative = a[0] === '-' && b[0] === '-';
+    
+    // Remove negative signs
+    if (a[0] === '-') a = a.slice(1);
+    if (b[0] === '-') b = b.slice(1);
+    
+    // Compare lengths
+    if (a.length > b.length) return bothNegative ? -1 : 1;
+    if (a.length < b.length) return bothNegative ? 1 : -1;
+    
+    // Compare digit by digit
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] > b[i]) return bothNegative ? -1 : 1;
+        if (a[i] < b[i]) return bothNegative ? 1 : -1;
+    }
+    
+    return 0;
+}
+
+/**
+ * Formats a big number with commas for readability.
+ * @param {string} n - The big number as a string.
+ * @returns {string} - Formatted number with commas.
+ */
+function formatBigNumber(n) {
+    if (!n || n === '0') return '0';
+    
+    const isNegative = n[0] === '-';
+    if (isNegative) {
+        n = n.slice(1);
+    }
+    
+    const parts = n.split('.');
+    const integerPart = parts[0];
+    
+    let formatted = '';
+    for (let i = 0; i < integerPart.length; i++) {
+        if (i > 0 && (integerPart.length - i) % 3 === 0) {
+            formatted += ',';
+        }
+        formatted += integerPart[i];
+    }
+    
+    if (parts.length > 1) {
+        formatted += '.' + parts[1];
+    }
+    
+    return isNegative ? '-' + formatted : formatted;
+}
+
+// =============================================================================
+// ADVANCED MATHEMATICAL OPERATIONS
+// =============================================================================
 
 /**
  * Calculates the power of a big number raised to an exponent.
- * @param {string} base - The base (large number as a string).
- * @param {number} exponent - The exponent (must be a non-negative integer).
+ * @param {string} base - The base.
+ * @param {number} exponent - The exponent (non-negative integer).
  * @returns {string} - The result of the power operation.
  */
 function powBigNumbers(base, exponent) {
     if (exponent < 0) {
-        throw new Error("Negative exponents not supported");
+        throw new Error('Negative exponents not supported');
     }
     
-    if (exponent === 0) return "1";
+    if (exponent === 0) return '1';
     if (exponent === 1) return base;
-    if (base === "0") return "0";
-    if (base === "1") return "1";
+    if (base === '0') return '0';
+    if (base === '1') return '1';
     
-    let result = "1";
+    let result = '1';
     for (let i = 0; i < exponent; i++) {
         result = mulBigNumbers(result, base);
     }
     
     return result;
 }
-exports.powBigNumbers = powBigNumbers;
 
 /**
  * Calculates the factorial of a number.
@@ -318,19 +351,18 @@ exports.powBigNumbers = powBigNumbers;
  */
 function factorial(n) {
     if (n < 0 || !Number.isInteger(n)) {
-        throw new Error("Input must be a non-negative integer");
+        throw new Error('Input must be a non-negative integer');
     }
     
-    if (n <= 1) return "1";
+    if (n <= 1) return '1';
     
-    let result = "1";
+    let result = '1';
     for (let i = 2; i <= n; i++) {
         result = mulBigNumbers(result, i.toString());
     }
     
     return result;
 }
-exports.factorial = factorial;
 
 /**
  * Calculates the greatest common divisor (GCD) of two big numbers.
@@ -339,17 +371,14 @@ exports.factorial = factorial;
  * @returns {string} - The GCD as a string.
  */
 function gcdBigNumbers(a, b) {
-    // Remove negative signs if present
+    // Remove negative signs
     if (a[0] === '-') a = a.slice(1);
     if (b[0] === '-') b = b.slice(1);
     
-    // Base case
-    if (b === "0") return a;
+    if (b === '0') return a;
     
-    // Recursive Euclidean algorithm
     return gcdBigNumbers(b, modBigNumbers(a, b));
 }
-exports.gcdBigNumbers = gcdBigNumbers;
 
 /**
  * Calculates the least common multiple (LCM) of two big numbers.
@@ -358,100 +387,64 @@ exports.gcdBigNumbers = gcdBigNumbers;
  * @returns {string} - The LCM as a string.
  */
 function lcmBigNumbers(a, b) {
-    // Remove negative signs if present
+    // Remove negative signs
     if (a[0] === '-') a = a.slice(1);
     if (b[0] === '-') b = b.slice(1);
     
-    // LCM calculation: |a*b|/gcd(a,b)
     const product = mulBigNumbers(a, b);
     const gcd = gcdBigNumbers(a, b);
     
     return divBigNumbers(product, gcd);
 }
-exports.lcmBigNumbers = lcmBigNumbers;
 
 /**
  * Calculates the square root of a big number using the Babylonian method.
  * @param {string} n - A non-negative big number as a string.
- * @param {number} precision - Number of decimal places (default: 0 for integer result).
+ * @param {number} precision - Number of decimal places (default: 0).
  * @returns {string} - The square root result as a string.
  * @throws {Error} - If input is negative.
  */
 function sqrtBigNumbers(n, precision = 0) {
     if (n[0] === '-') {
-        throw new Error("Cannot calculate square root of a negative number");
+        throw new Error('Cannot calculate square root of a negative number');
     }
     
-    if (n === "0" || n === "1") return n;
+    if (n === '0' || n === '1') return n;
     
-    // Scale the number by 10^(2*precision) to handle decimals
+    // Scale for decimal precision
     let scaledN = n;
     for (let i = 0; i < 2 * precision; i++) {
-        scaledN += "0";
+        scaledN += '0';
     }
     
-    // Initial guess: half the number of digits in n
-    let x = "1";
+    // Initial guess
+    let x = '1';
     for (let i = 0; i < Math.floor(scaledN.length / 2); i++) {
-        x += "0";
+        x += '0';
     }
     
-    // Babylonian method iterations
-    let prevX = "0";
-    while (compareBigNumbers(subBigNumbers(x, prevX), "1") > 0) {
+    // Babylonian method
+    let prevX = '0';
+    while (compareBigNumbers(subBigNumbers(x, prevX), '1') > 0) {
         prevX = x;
-        // x = (x + n/x) / 2
-        const div = divBigNumbers(scaledN, x);
-        const sum = addBigNumbers(x, div);
-        x = divBigNumbers(sum, "2");
+        const quotient = divBigNumbers(scaledN, x);
+        const sum = addBigNumbers(x, quotient);
+        x = divBigNumbers(sum, '2');
     }
     
-    // Insert decimal point if precision > 0
+    // Format result with decimal point
     if (precision > 0) {
         const integerPart = x.slice(0, -precision);
         const decimalPart = x.slice(-precision);
-        return integerPart + (decimalPart ? "." + decimalPart : "");
+        return integerPart + (decimalPart ? '.' + decimalPart : '');
     }
     
     return x;
 }
-exports.sqrtBigNumbers = sqrtBigNumbers;
 
-/**
- * Formats a big number with commas for readability.
- * @param {string} n - The big number as a string.
- * @returns {string} - Formatted number with commas.
- */
-function formatBigNumber(n) {
-    if (!n || n === "0") return "0";
-    
-    // Handle negative numbers
-    const isNegative = n[0] === '-';
-    if (isNegative) {
-        n = n.slice(1);
-    }
-    
-    // Split into integer and decimal parts if there's a decimal point
-    const parts = n.split('.');
-    const integerPart = parts[0];
-    
-    // Add commas to the integer part
-    let formatted = "";
-    for (let i = 0; i < integerPart.length; i++) {
-        if (i > 0 && (integerPart.length - i) % 3 === 0) {
-            formatted += ",";
-        }
-        formatted += integerPart[i];
-    }
-    
-    // Add decimal part if it exists
-    if (parts.length > 1) {
-        formatted += "." + parts[1];
-    }
-    
-    return isNegative ? "-" + formatted : formatted;
-}
-exports.formatBigNumber = formatBigNumber;
+// =============================================================================
+// NUMBER CONVERSION AND SPECIALIZED FUNCTIONS
+// =============================================================================
 
 /**
  * Converts a number between different bases.
@@ -462,20 +455,18 @@ exports.formatBigNumber = formatBigNumber;
  */
 function convertBase(number, fromBase, toBase) {
     if (fromBase < 2 || fromBase > 36 || toBase < 2 || toBase > 36) {
-        throw new Error("Bases must be between 2 and 36");
+        throw new Error('Bases must be between 2 and 36');
     }
     
-    // Handle negative numbers
     const isNegative = number[0] === '-';
     if (isNegative) {
         number = number.slice(1);
     }
     
-    // Convert to decimal first
-    let decimal = "0";
-    const digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let decimal = '0';
+    const digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     
-    // Calculate decimal value
+    // Convert to decimal
     for (let i = 0; i < number.length; i++) {
         const digit = number[i].toUpperCase();
         const value = digits.indexOf(digit);
@@ -487,81 +478,19 @@ function convertBase(number, fromBase, toBase) {
         decimal = addBigNumbers(mulBigNumbers(decimal, fromBase.toString()), value.toString());
     }
     
-    // Convert from decimal to target base
-    if (decimal === "0") return "0";
+    // Convert to target base
+    if (decimal === '0') return '0';
     
-    let result = "";
-    while (decimal !== "0") {
+    let result = '';
+    while (decimal !== '0') {
         const remainder = modBigNumbers(decimal, toBase.toString());
         const value = parseInt(remainder, 10);
         result = digits[value] + result;
         decimal = divBigNumbers(decimal, toBase.toString());
     }
     
-    return isNegative ? "-" + result : result;
+    return isNegative ? '-' + result : result;
 }
-exports.convertBase = convertBase;
-
-/**
- * Checks if a big number is prime using the Miller-Rabin primality test.
- * @param {string} n - The number to check.
- * @param {number} k - Number of iterations for the test (higher is more accurate).
- * @returns {boolean} - True if the number is probably prime, false otherwise.
- */
-function isPrimeBigNumber(n, k = 10) {
-    if (n === "0" || n === "1") return false;
-    if (n === "2" || n === "3") return true;
-    
-    // Check if even
-    if (parseInt(n[n.length - 1]) % 2 === 0) return false;
-    
-    // Write n-1 as 2^r * d
-    let d = subBigNumbers(n, "1");
-    let r = 0;
-    
-    while (modBigNumbers(d, "2") === "0") {
-        d = divBigNumbers(d, "2");
-        r++;
-    }
-    
-    // Witness loop
-    witnessLoop: for (let i = 0; i < k; i++) {
-        // Generate random number between 2 and n-2
-        const nMinus2 = subBigNumbers(n, "2");
-        let a = "2"; // Use a fixed sequence of bases for simplicity
-        
-        if (i === 0) a = "2";
-        else if (i === 1) a = "3";
-        else if (i === 2) a = "5";
-        else if (i === 3) a = "7";
-        else if (i === 4) a = "11";
-        else if (i === 5) a = "13";
-        else if (i === 6) a = "17";
-        else if (i === 7) a = "19";
-        else if (i === 8) a = "23";
-        else a = "29";
-        
-        if (compareBigNumbers(a, nMinus2) >= 0) {
-            a = subBigNumbers(a, "1");
-        }
-        
-        // x = a^d mod n
-        let x = powModBigNumbers(a, d, n);
-        
-        if (x === "1" || x === subBigNumbers(n, "1")) continue;
-        
-        for (let j = 0; j < r - 1; j++) {
-            x = powModBigNumbers(x, "2", n);
-            if (x === subBigNumbers(n, "1")) continue witnessLoop;
-            if (x === "1") return false;
-        }
-        
-        return false;
-    }
-    
-    return true;
-}
-exports.isPrimeBigNumber = isPrimeBigNumber;
 
 /**
  * Calculates (base^exponent) % modulus efficiently for big numbers.
@@ -571,28 +500,26 @@ exports.isPrimeBigNumber = isPrimeBigNumber;
  * @returns {string} - The result of the modular exponentiation.
  */
 function powModBigNumbers(base, exponent, modulus) {
-    if (modulus === "1") return "0";
-    if (exponent === "0") return "1";
+    if (modulus === '1') return '0';
+    if (exponent === '0') return '1';
     
-    // Remove negative signs if present in exponent
-    const isNegativeExponent = exponent[0] === '-';
-    if (isNegativeExponent) {
-        throw new Error("Negative exponents not supported in modular exponentiation");
+    if (exponent[0] === '-') {
+        throw new Error('Negative exponents not supported in modular exponentiation');
     }
     
-    // Convert exponent to binary for efficient calculation
-    let binaryExp = [];
+    // Convert exponent to binary
+    const binaryExp = [];
     let exp = exponent;
-    while (exp !== "0") {
-        binaryExp.push(modBigNumbers(exp, "2"));
-        exp = divBigNumbers(exp, "2");
+    while (exp !== '0') {
+        binaryExp.push(modBigNumbers(exp, '2'));
+        exp = divBigNumbers(exp, '2');
     }
     
-    let result = "1";
+    let result = '1';
     let baseMod = modBigNumbers(base, modulus);
     
     for (let i = 0; i < binaryExp.length; i++) {
-        if (binaryExp[i] === "1") {
+        if (binaryExp[i] === '1') {
             result = modBigNumbers(mulBigNumbers(result, baseMod), modulus);
         }
         baseMod = modBigNumbers(mulBigNumbers(baseMod, baseMod), modulus);
@@ -600,4 +527,88 @@ function powModBigNumbers(base, exponent, modulus) {
     
     return result;
 }
-exports.powModBigNumbers = powModBigNumbers;
+
+/**
+ * Checks if a big number is prime using the Miller-Rabin primality test.
+ * @param {string} n - The number to check.
+ * @param {number} k - Number of iterations for the test (default: 10).
+ * @returns {boolean} - True if the number is probably prime, false otherwise.
+ */
+function isPrimeBigNumber(n, k = 10) {
+    if (n === '0' || n === '1') return false;
+    if (n === '2' || n === '3') return true;
+    
+    // Check if even
+    if (parseInt(n[n.length - 1], 10) % 2 === 0) return false;
+    
+    // Write n-1 as 2^r * d
+    let d = subBigNumbers(n, '1');
+    let r = 0;
+    
+    while (modBigNumbers(d, '2') === '0') {
+        d = divBigNumbers(d, '2');
+        r++;
+    }
+    
+    // Predefined test bases for deterministic testing
+    const testBases = ['2', '3', '5', '7', '11', '13', '17', '19', '23', '29'];
+    const nMinus2 = subBigNumbers(n, '2');
+    
+    // Witness loop
+    witnessLoop: for (let i = 0; i < Math.min(k, testBases.length); i++) {
+        let a = testBases[i];
+        
+        if (compareBigNumbers(a, nMinus2) >= 0) {
+            a = subBigNumbers(a, '1');
+        }
+        
+        let x = powModBigNumbers(a, d, n);
+        
+        if (x === '1' || x === subBigNumbers(n, '1')) continue;
+        
+        for (let j = 0; j < r - 1; j++) {
+            x = powModBigNumbers(x, '2', n);
+            if (x === subBigNumbers(n, '1')) continue witnessLoop;
+            if (x === '1') return false;
+        }
+        
+        return false;
+    }
+    
+    return true;
+}
+
+// =============================================================================
+// EXPORTS
+// =============================================================================
+
+module.exports = {
+    // Basic operations
+    sum,
+    sub,
+    mul,
+    div,
+    
+    // Big number operations
+    addBigNumbers,
+    subBigNumbers,
+    mulBigNumbers,
+    divBigNumbers,
+    modBigNumbers,
+    compareBigNumbers,
+    
+    // Advanced operations
+    powBigNumbers,
+    factorial,
+    gcdBigNumbers,
+    lcmBigNumbers,
+    sqrtBigNumbers,
+    
+    // Utility functions
+    formatBigNumber,
+    convertBase,
+    
+    // Specialized functions
+    powModBigNumbers,
+    isPrimeBigNumber
+};
