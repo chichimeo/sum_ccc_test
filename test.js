@@ -1,5 +1,5 @@
 /**
- * @fileoverview Unit tests for the addBigNumbers function.
+ * @fileoverview Unit tests for the addBigNumbers function. 
  */
 const { addBigNumbers } = require('./index.js');
 
